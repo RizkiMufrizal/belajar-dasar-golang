@@ -30,9 +30,15 @@ func main() {
 	data = append(data, riz)
 
 	fmt.Println(data)
+
+	rizki.helloCustomer("joko")
 }
 
 type Customer struct {
 	Name, Address string
 	Age           int
+}
+
+func (customer Customer) helloCustomer(name string) {
+	fmt.Println("hello", name, "My Name is", customer.Name)
 }
