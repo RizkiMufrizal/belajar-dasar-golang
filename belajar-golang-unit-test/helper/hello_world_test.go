@@ -3,6 +3,7 @@ package helper
 import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"runtime"
 	"testing"
 )
 
@@ -30,4 +31,11 @@ func TestHelloWorldAssertion(t *testing.T) {
 func TestHelloWorldRequire(t *testing.T) {
 	result := HelloWorld("Rizki")
 	require.Equal(t, "Hello Rizki", result, "Result Must be 'Hello Rizki'")
+}
+
+func TestSKip(t *testing.T) {
+	t.Log("Server", runtime.GOOS)
+	if runtime.GOOS == "linux" {
+		t.Skip("Can not run on linux")
+	}
 }
