@@ -46,3 +46,14 @@ func TestSKip(t *testing.T) {
 		t.Skip("Can not run on linux")
 	}
 }
+
+func TestSubTest(t *testing.T) {
+	t.Run("Hello", func(t *testing.T) {
+		result := HelloWorld("Rizki")
+		assert.Equal(t, "Hello Rizki", result, "Result Must be 'Hello Rizki'")
+	})
+	t.Run("Hi", func(t *testing.T) {
+		result := HiWorld("Rizki")
+		require.Equal(t, "Hi Rizki", result, "Result Must be 'Hello Rizki'")
+	})
+}
