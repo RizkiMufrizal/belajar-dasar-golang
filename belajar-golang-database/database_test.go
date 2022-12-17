@@ -92,3 +92,31 @@ func TestQuerySql2(t *testing.T) {
 	}
 	defer rows.Close()
 }
+
+func TestSQLInjection(t *testing.T) {
+	db := GetConnection()
+	defer db.Close()
+
+	ctx := context.Background()
+
+	username := "rizki'; #"
+	password := "rizki1"
+	script := "select username from user where username = '" + username + "' and password = '" + password + "' LIMIT 1"
+	fmt.Println(script)
+	rows, err := db.QueryContext(ctx, script)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		var username string
+		err := rows.Scan(&username)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("sukses login", username)
+	} else {
+		fmt.Println("Gagal Login")
+	}
+}
