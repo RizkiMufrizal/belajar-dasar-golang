@@ -53,3 +53,42 @@ func TestQuerySql(t *testing.T) {
 	}
 	defer rows.Close()
 }
+
+func TestQuerySql2(t *testing.T) {
+	db := GetConnection()
+	defer db.Close()
+
+	context := context.Background()
+
+	script := "select id, name, email, balance, rating, birth_date, married, created_at from customer"
+	rows, err := db.QueryContext(context, script)
+	if err != nil {
+		panic(err)
+	}
+	for rows.Next() {
+		var id, name, email sql.NullString
+		var balance int32
+		var rating float64
+		var birthDate, createAt sql.NullTime
+		var married bool
+		err := rows.Scan(&id, &name, &email, &balance, &rating, &birthDate, &married, &createAt)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("=============================")
+		fmt.Println("id", id)
+		fmt.Println("name", name)
+		if email.Valid {
+			fmt.Println("email", email.String)
+		}
+		fmt.Println("balance", balance)
+		fmt.Println("rating", rating)
+		if birthDate.Valid {
+			fmt.Println("birthDate", birthDate.Time)
+		}
+		fmt.Println("createAt", createAt)
+		fmt.Println("married", married)
+		fmt.Println("=============================")
+	}
+	defer rows.Close()
+}
