@@ -120,3 +120,47 @@ func TestSQLInjection(t *testing.T) {
 		fmt.Println("Gagal Login")
 	}
 }
+
+func TestSQLQueryParameter(t *testing.T) {
+	db := GetConnection()
+	defer db.Close()
+
+	ctx := context.Background()
+
+	username := "rizki'; #"
+	password := "rizki1"
+	script := "select username from user where username = ? and password = ? LIMIT 1"
+	fmt.Println(script)
+	rows, err := db.QueryContext(ctx, script, username, password)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		var username string
+		err := rows.Scan(&username)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("sukses login", username)
+	} else {
+		fmt.Println("Gagal Login")
+	}
+}
+
+func TestSQLExecuteParameter(t *testing.T) {
+	db := GetConnection()
+	defer db.Close()
+
+	context := context.Background()
+
+	username := "admim"
+	password := "password"
+	script := "insert into user(username, password) values(?, ?)"
+	_, err := db.ExecContext(context, script, username, password)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Success Insert to database")
+}
