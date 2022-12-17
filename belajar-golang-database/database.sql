@@ -23,6 +23,7 @@ VALUES('budi', 'Budi', 'budi@gmail.com', 5000, 3.0, '2000-8-9', false);
 INSERT INTO customer(id, name, email, balance, rating, birth_date, married)
 VALUES('joko', 'Joko', NULL, 5000, 3.0, NULL, false);
 
+-- Table User
 CREATE TABLE user(
     username varchar(100) not null,
     password varchar(100) not null,
@@ -31,3 +32,12 @@ CREATE TABLE user(
 
 INSERT INTO user(username, password)
 VALUES('rizki', 'rizki');
+
+-- Table Comment
+
+CREATE TABLE comments(
+    id int not null auto_increment,
+    email varchar(100) not null,
+    comment text,
+    primary key(id)
+)engine=InnoDb;

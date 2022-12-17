@@ -155,7 +155,7 @@ func TestSQLExecuteParameter(t *testing.T) {
 
 	context := context.Background()
 
-	username := "admim"
+	username := "admin"
 	password := "password"
 	script := "insert into user(username, password) values(?, ?)"
 	_, err := db.ExecContext(context, script, username, password)
@@ -163,4 +163,24 @@ func TestSQLExecuteParameter(t *testing.T) {
 		panic(err)
 	}
 	fmt.Println("Success Insert to database")
+}
+
+func TestSQLExecuteAutoIncrement(t *testing.T) {
+	db := GetConnection()
+	defer db.Close()
+
+	context := context.Background()
+
+	email := "rizki@gmail.com"
+	comment := "ini adalah contoh comment"
+	script := "insert into comments(email, comment) values(?, ?)"
+	result, err := db.ExecContext(context, script, email, comment)
+	if err != nil {
+		panic(err)
+	}
+	lastId, err := result.LastInsertId()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Success Insert to database dengan id :", lastId)
 }
