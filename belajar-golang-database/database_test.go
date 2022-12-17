@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strconv"
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -183,4 +184,64 @@ func TestSQLExecuteAutoIncrement(t *testing.T) {
 		panic(err)
 	}
 	fmt.Println("Success Insert to database dengan id :", lastId)
+}
+
+func TestSQLExecutePreparedStatement(t *testing.T) {
+	db := GetConnection()
+	defer db.Close()
+
+	context := context.Background()
+
+	script := "insert into comments(email, comment) values(?, ?)"
+	statement, err := db.PrepareContext(context, script)
+	if err != nil {
+		panic(err)
+	}
+
+	for i := 1; i <= 10; i++ {
+		email := "rizki" + strconv.Itoa(i) + "@gmail.com"
+		comment := "ini adalah contoh comment ke " + strconv.Itoa(i)
+
+		result, err := statement.ExecContext(context, email, comment)
+		if err != nil {
+			panic(err)
+		}
+		lastId, err := result.LastInsertId()
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Berhasil Insert dengan id", lastId)
+	}
+
+	defer statement.Close()
+}
+
+func TestSQLQueryPreparedStatement(t *testing.T) {
+	db := GetConnection()
+	defer db.Close()
+
+	context := context.Background()
+
+	script := "select email, comment from comments"
+	statement, err := db.PrepareContext(context, script)
+	if err != nil {
+		panic(err)
+	}
+
+	result, err := statement.QueryContext(context)
+	if err != nil {
+		panic(err)
+	}
+
+	for result.Next() {
+		var email, comment string
+		err := result.Scan(&email, &comment)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("email", email)
+		fmt.Println("comment", comment)
+	}
+
+	defer statement.Close()
 }
