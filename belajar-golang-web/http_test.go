@@ -159,3 +159,30 @@ func TestResponseCodeBadRequest(t *testing.T) {
 	assert.Equal(t, "Bad Request", bodyString, "Must Bad Request")
 	assert.Equal(t, 400, response.StatusCode, "Must 400")
 }
+
+func SetCookie(writer http.ResponseWriter, request *http.Request) {
+	cookie := new(http.Cookie)
+	cookie.Name = "X-COOKIE"
+	cookie.Value = request.URL.Query().Get("name")
+	cookie.Path = "/"
+
+	http.SetCookie(writer, cookie)
+	writer.WriteHeader(200)
+	fmt.Fprint(writer, "Success Set Cookie")
+}
+
+func TestCookie(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080/hello?name=rizki", nil)
+
+	recorder := httptest.NewRecorder()
+	SetCookie(recorder, request)
+
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
+	bodyString := string(body)
+	cookies := response.Cookies()
+
+	assert.Equal(t, "Success Set Cookie", bodyString, "Must Success Set Cookie")
+	assert.Equal(t, 200, response.StatusCode, "Must 200")
+	assert.Equal(t, "rizki", cookies[0].Value, "Must 200")
+}
