@@ -75,3 +75,23 @@ func TestQueryMultiParameter(t *testing.T) {
 
 	assert.Equal(t, "hello rizki,mufrizal", bodyString, "Must hello rizki,mufrizal")
 }
+
+func HeaderHandler(writer http.ResponseWriter, request *http.Request) {
+	header := request.Header.Get("Content-Type")
+	writer.Header().Add("X-CUSTOM", "belajar golang")
+	fmt.Fprint(writer, "header "+header)
+}
+
+func TestHeader(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080/hello", nil)
+	request.Header.Add("Content-Type", "application/json")
+	recorder := httptest.NewRecorder()
+	HeaderHandler(recorder, request)
+
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
+	bodyString := string(body)
+
+	assert.Equal(t, "header application/json", bodyString, "Must header")
+	assert.Equal(t, "belajar golang", response.Header.Get("X-CUSTOM"), "Must belajar golang")
+}
