@@ -305,3 +305,28 @@ func TestSimpleCreateGlobalFunction(t *testing.T) {
 	body, _ := io.ReadAll(response.Body)
 	fmt.Println(string(body))
 }
+
+var t = template.New("FUNCTION").Funcs(map[string]interface{}{
+	"upper": func(value string) string {
+		return strings.ToUpper(value)
+	},
+})
+var tg, _ = t.ParseFS(templates, "templates/*.gohtml")
+
+func SimpleTempleteCaching(writer http.ResponseWriter, r *http.Request, action *MyPage) {
+	tg.ExecuteTemplate(writer, "sample", action)
+}
+
+func TestSimpleCaching(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
+	recorder := httptest.NewRecorder()
+
+	action := MyPage{
+		Name: "Rizki",
+	}
+
+	SimpleTempleteCaching(recorder, request, &action)
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
+	fmt.Println(string(body))
+}
