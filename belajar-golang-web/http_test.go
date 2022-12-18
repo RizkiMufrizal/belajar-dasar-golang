@@ -95,3 +95,28 @@ func TestHeader(t *testing.T) {
 	assert.Equal(t, "header application/json", bodyString, "Must header")
 	assert.Equal(t, "belajar golang", response.Header.Get("X-CUSTOM"), "Must belajar golang")
 }
+
+func FormPostHandler(writer http.ResponseWriter, request *http.Request) {
+	err := request.ParseForm()
+	if err != nil {
+		panic(err)
+	}
+	firstName := request.PostForm.Get("firstName")
+	lastName := request.PostForm.Get("lastName")
+	fmt.Fprintf(writer, "hello %s %s", firstName, lastName)
+}
+
+func TestFormPost(t *testing.T) {
+	requestBody := strings.NewReader("firstName=rizki&lastName=mufrizal")
+	request := httptest.NewRequest(http.MethodPost, "http://localhost:8080/post", requestBody)
+	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	recorder := httptest.NewRecorder()
+	FormPostHandler(recorder, request)
+
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
+	bodyString := string(body)
+
+	assert.Equal(t, "hello rizki mufrizal", bodyString, "Must rizki mufrizal")
+}
