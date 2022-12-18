@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -242,6 +243,64 @@ func TestSimpleTempleteLayout(t *testing.T) {
 	}
 
 	SimpleTempleteLayout(recorder, request, &action)
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
+	fmt.Println(string(body))
+}
+
+type MyPage struct {
+	Name string
+}
+
+func (page MyPage) SayHello(name string) string {
+	return "Hello " + name + ", My Name is " + page.Name
+}
+
+func SimpleTempleteFuction(writer http.ResponseWriter, r *http.Request, action *MyPage) {
+	t, err := template.ParseFS(templates, "templates/*.gohtml")
+	if err != nil {
+		panic(err)
+	}
+	t.ExecuteTemplate(writer, "sample", action)
+}
+
+func TestSimpleFunction(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
+	recorder := httptest.NewRecorder()
+
+	action := MyPage{
+		Name: "Rizki",
+	}
+
+	SimpleTempleteFuction(recorder, request, &action)
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
+	fmt.Println(string(body))
+}
+
+func SimpleTempleteCreateGlobalFuction(writer http.ResponseWriter, r *http.Request, action *MyPage) {
+	t := template.New("FUNCTION")
+	t = t.Funcs(map[string]interface{}{
+		"upper": func(value string) string {
+			return strings.ToUpper(value)
+		},
+	})
+	tg, err := t.ParseFS(templates, "templates/*.gohtml")
+	if err != nil {
+		panic(err)
+	}
+	tg.ExecuteTemplate(writer, "sample", action)
+}
+
+func TestSimpleCreateGlobalFunction(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
+	recorder := httptest.NewRecorder()
+
+	action := MyPage{
+		Name: "Rizki",
+	}
+
+	SimpleTempleteCreateGlobalFuction(recorder, request, &action)
 	response := recorder.Result()
 	body, _ := io.ReadAll(response.Body)
 	fmt.Println(string(body))
