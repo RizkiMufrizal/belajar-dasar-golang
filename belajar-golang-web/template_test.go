@@ -330,3 +330,20 @@ func TestSimpleCaching(t *testing.T) {
 	body, _ := io.ReadAll(response.Body)
 	fmt.Println(string(body))
 }
+
+func SimpleTempleteXSS(writer http.ResponseWriter, r *http.Request) {
+	tg.ExecuteTemplate(writer, "post.gohtml", map[string]interface{}{
+		"Title": "Go-lang",
+		"Body":  template.HTML("<p>Selamat Belajar Golang</p>"),
+	})
+}
+
+func TestSimpleXss(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
+	recorder := httptest.NewRecorder()
+
+	SimpleTempleteXSS(recorder, request)
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
+	fmt.Println(string(body))
+}
