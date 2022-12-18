@@ -115,31 +115,110 @@ type TemplateSampleStruct struct {
 	Title   string
 	Name    string
 	Address Address
+	Nilai   int32
 }
 
 type Address struct {
 	Street string
 }
 
-func SimpleTempletDataStruct(writer http.ResponseWriter, r *http.Request) {
+func SimpleTempletDataStruct(writer http.ResponseWriter, r *http.Request, action *TemplateSampleStruct) {
 	t, err := template.ParseFS(templates, "templates/*.gohtml")
 	if err != nil {
 		panic(err)
 	}
-	t.ExecuteTemplate(writer, "name.gohtml", TemplateSampleStruct{
-		Title: "Sample Title",
-		Name:  "Rizki",
-		Address: Address{
-			Street: "Akses UI",
-		},
-	})
+	t.ExecuteTemplate(writer, "name.gohtml", action)
 }
 
 func TestSimpleTempletDataStruct(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
 	recorder := httptest.NewRecorder()
 
-	SimpleTempletDataStruct(recorder, request)
+	action := TemplateSampleStruct{
+		Title: "Sample Title",
+		Name:  "Rizki",
+		Nilai: 90,
+		Address: Address{
+			Street: "Akses UI",
+		},
+	}
+
+	SimpleTempletDataStruct(recorder, request, &action)
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
+	fmt.Println(string(body))
+}
+
+func SimpleTempleteAction(writer http.ResponseWriter, r *http.Request, action *TemplateSampleStruct) {
+	t, err := template.ParseFS(templates, "templates/*.gohtml")
+	if err != nil {
+		panic(err)
+	}
+	t.ExecuteTemplate(writer, "templateaction.gohtml", action)
+}
+
+func TestSimpleTempletAction(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
+	recorder := httptest.NewRecorder()
+
+	action := TemplateSampleStruct{
+		Title: "Sample Title",
+		Name:  "Rizki",
+		Nilai: 90,
+		Address: Address{
+			Street: "Akses UI",
+		},
+	}
+
+	SimpleTempleteAction(recorder, request, &action)
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
+	fmt.Println(string(body))
+}
+
+func SimpleTempleteArray(writer http.ResponseWriter, r *http.Request, action *map[string]interface{}) {
+	t, err := template.ParseFS(templates, "templates/*.gohtml")
+	if err != nil {
+		panic(err)
+	}
+	t.ExecuteTemplate(writer, "templateaction.gohtml", action)
+}
+
+func TestSimpleTempleteArray(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
+	recorder := httptest.NewRecorder()
+
+	action := map[string]interface{}{
+		"Hobbies": []map[string]interface{}{
+			{
+				"Olahraga": "Mtb",
+			},
+			{
+				"Olahraga": "Bola",
+			},
+		},
+	}
+
+	SimpleTempleteArray(recorder, request, &action)
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
+	fmt.Println(string(body))
+}
+
+func TestSimpleTempleteWith(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
+	recorder := httptest.NewRecorder()
+
+	action := TemplateSampleStruct{
+		Title: "Sample Title",
+		Name:  "Rizki",
+		Nilai: 90,
+		Address: Address{
+			Street: "Akses UI",
+		},
+	}
+
+	SimpleTempletDataStruct(recorder, request, &action)
 	response := recorder.Result()
 	body, _ := io.ReadAll(response.Body)
 	fmt.Println(string(body))

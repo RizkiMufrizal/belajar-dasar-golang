@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>{{.Title}}</title>
+</head>
+<body>
+{{if .Name}}
+    <h1>Hello {{.Name}}</h1>
+{{else}}
+    <h1>Hello</h1>
+{{end}}
+
+{{if eq .Nilai 90}}
+    <h1>Mantap</h1>
+{{else if eq .Nila 80}}
+    <h1>Lumayan</h1>
+{{else}}
+    <h1>Tidak ada nilai</h1>
+{{end}}
+
+{{range $index, $element := .Hobbies}}
+    <h1>{{$element.Olahraga}}</h1>
+{{else}}
+    <h1>Data tidak ada</h1>
+{{end}}
+
+</body>
+</html>
