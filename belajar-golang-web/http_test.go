@@ -120,3 +120,42 @@ func TestFormPost(t *testing.T) {
 
 	assert.Equal(t, "hello rizki mufrizal", bodyString, "Must rizki mufrizal")
 }
+
+func ResponseCode(writer http.ResponseWriter, request *http.Request) {
+	name := request.URL.Query().Get("name")
+	if name == "" {
+		writer.WriteHeader(400)
+		fmt.Fprint(writer, "Bad Request")
+	} else {
+		writer.WriteHeader(200)
+		fmt.Fprint(writer, "Ok")
+	}
+}
+
+func TestResponseCode(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080/hello?name=rizki", nil)
+
+	recorder := httptest.NewRecorder()
+	ResponseCode(recorder, request)
+
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
+	bodyString := string(body)
+
+	assert.Equal(t, "Ok", bodyString, "Must Ok")
+	assert.Equal(t, 200, response.StatusCode, "Must 200")
+}
+
+func TestResponseCodeBadRequest(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080/hello", nil)
+
+	recorder := httptest.NewRecorder()
+	ResponseCode(recorder, request)
+
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
+	bodyString := string(body)
+
+	assert.Equal(t, "Bad Request", bodyString, "Must Bad Request")
+	assert.Equal(t, 400, response.StatusCode, "Must 400")
+}
