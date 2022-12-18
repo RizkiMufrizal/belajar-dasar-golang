@@ -86,3 +86,61 @@ func TestSimpleFileDirectoryEmbedHtml(t *testing.T) {
 	body, _ := io.ReadAll(response.Body)
 	fmt.Println(string(body))
 }
+
+func SimpleTempletData(writer http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFS(templates, "templates/*.gohtml")
+	if err != nil {
+		panic(err)
+	}
+	t.ExecuteTemplate(writer, "name.gohtml", map[string]interface{}{
+		"Title": "Sample Title",
+		"Name":  "Rizki",
+		"Address": map[string]interface{}{
+			"Street": "Akses UI",
+		},
+	})
+}
+
+func TestSimpleTempletData(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
+	recorder := httptest.NewRecorder()
+
+	SimpleTempletData(recorder, request)
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
+	fmt.Println(string(body))
+}
+
+type TemplateSampleStruct struct {
+	Title   string
+	Name    string
+	Address Address
+}
+
+type Address struct {
+	Street string
+}
+
+func SimpleTempletDataStruct(writer http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFS(templates, "templates/*.gohtml")
+	if err != nil {
+		panic(err)
+	}
+	t.ExecuteTemplate(writer, "name.gohtml", TemplateSampleStruct{
+		Title: "Sample Title",
+		Name:  "Rizki",
+		Address: Address{
+			Street: "Akses UI",
+		},
+	})
+}
+
+func TestSimpleTempletDataStruct(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
+	recorder := httptest.NewRecorder()
+
+	SimpleTempletDataStruct(recorder, request)
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
+	fmt.Println(string(body))
+}
