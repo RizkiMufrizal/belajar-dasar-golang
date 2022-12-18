@@ -223,3 +223,26 @@ func TestSimpleTempleteWith(t *testing.T) {
 	body, _ := io.ReadAll(response.Body)
 	fmt.Println(string(body))
 }
+
+func SimpleTempleteLayout(writer http.ResponseWriter, r *http.Request, action *map[string]interface{}) {
+	t, err := template.ParseFS(templates, "templates/*.gohtml")
+	if err != nil {
+		panic(err)
+	}
+	t.ExecuteTemplate(writer, "layout", action)
+}
+
+func TestSimpleTempleteLayout(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
+	recorder := httptest.NewRecorder()
+
+	action := map[string]interface{}{
+		"Name":  "Rizki",
+		"Title": "Belajar Golang",
+	}
+
+	SimpleTempleteLayout(recorder, request, &action)
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
+	fmt.Println(string(body))
+}
